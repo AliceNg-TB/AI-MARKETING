@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AI行銷數據顧問 · 未來趨勢洞察</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', 'Poppins', 'Noto Sans TC', system-ui, -apple-system, 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #020617;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .ai-tech-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .ai-tech-bg svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 1400px;
+            height: 88vh;
+            background: rgba(8, 20, 36, 0.65);
+            backdrop-filter: blur(14px);
+            border-radius: 48px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(56, 189, 248, 0.4);
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+            z-index: 2;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            position: relative;
+        }
+
+        .robot-panel {
+            flex: 1.3;
+            background: rgba(1, 12, 22, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 24px 18px;
+            border-right: 1px solid rgba(56, 189, 248, 0.4);
+            gap: 24px;
+        }
+
+        .data-avatar {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            margin-top: 10px;
+            filter: drop-shadow(0 0 20px rgba(0, 180, 255, 0.5));
+            animation: floatData 4s ease-in-out infinite;
+        }
+        @keyframes floatData {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
+
+        canvas#dataCoreCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.7), 0 20px 35px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .data-insights {
+            width: 100%;
+            background: rgba(0, 20, 45, 0.65);
+            backdrop-filter: blur(8px);
+            border-radius: 28px;
+            padding: 16px 18px;
+            border: 1px solid rgba(0, 200, 255, 0.45);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .insight-title {
+            font-size: 0.9rem;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            color: #7dd3fc;
+            border-left: 4px solid #38bdf8;
+            padding-left: 12px;
+            margin-bottom: 14px;
+        }
+        .insight-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .data-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #e2f0ff;
+            border-bottom: 1px dashed rgba(56, 189, 248, 0.3);
+            padding-bottom: 10px;
+        }
+        .data-label {
+            font-weight: 700;
+            background: #0f3b5c;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #b8f2ff;
+            font-family: monospace;
+            white-space: nowrap;
+        }
+        .data-text {
+            font-weight: 400;
+            font-size: 0.82rem;
+        }
+
+        /* TB Logo 已缩小并右上移 */
+        .tb-logo {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0, 20, 40, 0.85);
+            backdrop-filter: blur(12px);
+            width: 36px;
+            height: 36px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            font-family: 'Montserrat', 'Inter', monospace;
+            color: #ffffff;
+            letter-spacing: 1px;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 0 18px rgba(0, 160, 255, 0.6);
+            z-index: 15;
+            transition: 0.2s;
+            text-shadow: 0 0 6px #00a6ff;
+        }
+        .tb-logo span {
+            background: linear-gradient(135deg, #b0f0ff, #3b82f6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .chat-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            min-height: 0;
+        }
+
+        /* 增加右侧内边距避免被 LOGO 覆盖 */
+        .chat-header {
+            padding: 20px 70px 20px 28px;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .chat-header h2 {
+            color: #f0f9ff;
+            font-weight: 500;
+            font-size: 1.45rem;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        .chat-header h2 i {
+            color: #38bdf8;
+            margin-right: 10px;
+        }
+        .badge-ai {
+            background: #0e2a3b;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #90e0ff;
+            border: 0.5px solid #2c8fbb;
+            white-space: nowrap;
+        }
+
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            scroll-behavior: smooth;
+        }
+        .messages-area::-webkit-scrollbar { width: 5px; }
+        .messages-area::-webkit-scrollbar-track { background: rgba(0, 150, 200, 0.2); border-radius: 10px; }
+        .messages-area::-webkit-scrollbar-thumb { background: #2c8fbb; border-radius: 10px; }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: fadeSlide 0.25s ease-out;
+        }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .message.user { flex-direction: row-reverse; }
+        .avatar-icon {
+            width: 42px;
+            height: 42px;
+            background: #103a52;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .message.user .avatar-icon { background: #1e5b8e; }
+        .message.bot .avatar-icon { background: #0f5f8c; color: #b3f0ff; }
+        .bubble {
+            max-width: 72%;
+            padding: 12px 18px;
+            border-radius: 28px;
+            background: #f1f9ff;
+            color: #071a2b;
+            font-size: 0.95rem;
+            line-height: 1.45;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            word-break: break-word;
+        }
+        .message.user .bubble {
+            background: linear-gradient(120deg, #1c6f9c, #0b4870);
+            color: white;
+            border-bottom-right-radius: 8px;
+        }
+        .message.bot .bubble {
+            background: #ffffffea;
+            border-bottom-left-radius: 8px;
+        }
+        .match-score {
+            font-size: 0.6rem;
+            margin-top: 8px;
+            opacity: 0.75;
+            background: #d9eaf3;
+            padding: 2px 8px;
+            border-radius: 30px;
+            display: inline-block;
+            font-family: monospace;
+            color: #005a8c;
+        }
+
+        .input-area {
+            padding: 18px 24px 26px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(56, 189, 248, 0.5);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .input-area input {
+            flex: 1;
+            background: rgba(15, 40, 58, 0.9);
+            border: 1px solid #38bdf8;
+            padding: 14px 20px;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            color: #f0fcff;
+            outline: none;
+            transition: 0.2s;
+        }
+        .input-area input:focus {
+            border-color: #7dd3fc;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.4);
+        }
+        .input-area button {
+            background: #2c7eb6;
+            border: none;
+            width: 54px;
+            height: 54px;
+            border-radius: 60px;
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .input-area button:hover {
+            background: #1e6a9c;
+            transform: scale(0.98);
+        }
+
+        .typing-indicator {
+            background: #cce5f5;
+            padding: 8px 18px;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .typing-indicator span {
+            width: 7px;
+            height: 7px;
+            background: #1e6a9c;
+            border-radius: 50%;
+            animation: blinkTyping 1s infinite;
+        }
+        @keyframes blinkTyping {
+            0%, 100% { opacity: 0.3; transform: scale(0.8);}
+            50% { opacity: 1; transform: scale(1.2);}
+        }
+
+        /* 响应式：小屏幕下进一步调整间距 */
+        @media (max-width: 850px) {
+            .chat-container { flex-direction: column; height: 92vh; }
+            .robot-panel { flex-direction: row; flex-wrap: wrap; padding: 16px; border-right: none; border-bottom: 1px solid #38bdf8; gap: 16px; justify-content: center; }
+            .data-avatar { width: 120px; height: 120px; margin: 0; }
+            .data-insights { width: auto; flex: 1; min-width: 200px; }
+            .chat-header { padding: 16px 55px 16px 20px; }
+            .chat-header h2 { font-size: 1.1rem; white-space: normal; }
+            .badge-ai { font-size: 0.65rem; }
+            .tb-logo { width: 32px; height: 32px; font-size: 16px; top: 10px; right: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ai-tech-bg">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+        <defs>
+            <radialGradient id="bgTech" cx="45%" cy="50%" r="75%">
+                <stop offset="0%" stop-color="#051b30"/>
+                <stop offset="60%" stop-color="#010a15"/>
+                <stop offset="100%" stop-color="#020617"/>
+            </radialGradient>
+            <pattern id="dataMatrix" width="60" height="60" patternUnits="userSpaceOnUse">
+                <rect width="60" height="60" fill="none"/>
+                <path d="M10 10 L50 10 M10 25 L40 25 M25 40 L55 40 M5 55 L35 55" stroke="#0f6b9e" stroke-width="0.8" fill="none" opacity="0.4"/>
+                <circle cx="30" cy="15" r="1.5" fill="#38bdf8" opacity="0.6"/>
+                <circle cx="50" cy="45" r="1.8" fill="#2f9acf" opacity="0.5"/>
+                <text x="45" y="28" fill="#2580b0" font-size="7" opacity="0.5">01</text>
+            </pattern>
+            <linearGradient id="neonGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00b4ff"/>
+                <stop offset="100%" stop-color="#3b82f6"/>
+            </linearGradient>
+        </defs>
+        <rect width="1200" height="800" fill="url(#bgTech)"/>
+        <rect width="1200" height="800" fill="url(#dataMatrix)" opacity="0.7"/>
+        <g opacity="0.2">
+            <path d="M0 400 L300 250 L600 380 L900 200 L1200 350" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="6 12">
+                <animate attributeName="stroke-dashoffset" values="0;-36" dur="5s" repeatCount="indefinite"/>
+            </path>
+            <path d="M200 800 L400 600 L700 720 L1100 500" fill="none" stroke="#3b82f6" stroke-width="1.2" stroke-dasharray="4 15">
+                <animate attributeName="stroke-dashoffset" values="0;-38" dur="4s" repeatCount="indefinite"/>
+            </path>
+        </g>
+        <g filter="url(#glowFilter)">
+            <circle cx="900" cy="180" r="3" fill="#00f2fe">
+                <animate attributeName="r" values="2;5;2" dur="3s" repeatCount="indefinite"/>
+            </circle>
+        </g>
+        <filter id="glowFilter"><feGaussianBlur stdDeviation="3"/></filter>
+    </svg>
+</div>
+
+<div class="chat-container">
+    <div class="robot-panel">
+        <div class="data-avatar">
+            <canvas id="dataCoreCanvas" width="300" height="300" style="width:100%; height:100%;"></canvas>
+        </div>
+        <div class="data-insights">
+            <div class="insight-title"><i class="fas fa-chart-line"></i> DATA: 未來行銷職能關鍵指標</div>
+            <div class="insight-list">
+                <div class="data-item"><span class="data-label">DATA: 數據技能需求</span><span class="data-text">87% 企業優先招募具數據分析力之行銷人才 (2025 數位轉型報告)</span></div>
+                <div class="data-item"><span class="data-label">DATA: AIGC 滲透率</span><span class="data-text">62% 行銷組織導入 AI 生成內容，生產力提升 41%</span></div>
+                <div class="data-item"><span class="data-label">DATA: 個人化 ROI</span><span class="data-text">數據驅動個人化行銷帶來轉換率提升 32%</span></div>
+                <div class="data-item"><span class="data-label">DATA: 跨領域整合</span><span class="data-text">74% 高績效團隊要求行銷＋產品/數據科學協作能力</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-panel">
+        <div class="chat-header">
+            <h2><i class="fas fa-microchip"></i> AI 行銷策略顧問 · 數據驅動未來</h2>
+            <div class="badge-ai">趨勢智庫 v2.0</div>
+        </div>
+        <div class="messages-area" id="messagesArea">
+            <div class="message bot">
+                <div class="avatar-icon"><i class="fas fa-database"></i></div>
+                <div class="bubble">
+                    您好，我是 AI 行銷趨勢數據顧問。<br>
+                    專注於數位轉型下的職涯發展策略、數據分析、AI自動化與跨領域整合。請問您想了解「行銷人才必備技能」、「內容行銷趨勢」或「ESG永續行銷」等議題？<br>
+                    <span class="match-score">DATA: 行銷轉型洞察引擎 即時回應</span>
+                </div>
+            </div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="輸入行銷趨勢問題，例如：數據分析能力的重要性" autocomplete="off">
+            <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+    <div class="tb-logo"><span>TB</span></div>
+</div>
+
+<script>
+    // ======================= 基於行銷專業趨勢文章建立知識庫 =======================
+    const marketingKnowledge = [
+        { question: "行銷專業未來核心競爭力", answer: "數據分析能力將成為行銷專業核心競爭力。未來行銷人才必須理解統計概念、Python、SQL或數據視覺化工具，從大數據萃取消費者洞察，精準預測轉換率並優化策略。" },
+        { question: "數據分析在行銷的重要性", answer: "DATA: 行銷決策越來越多依賴數據支持，CRM、社群分析與AI預測模型已成標配。具備數據解讀能力可讓行銷人從大量資料中找出成長機會。" },
+        { question: "內容行銷未來趨勢", answer: "品牌必須透過故事建立情感連結，短影音、跨媒體敘事及即時創作能力將更重要。品牌故事力結合個人化內容可大幅提升忠誠度。" },
+        { question: "AI與自動化如何改變行銷工作", answer: "自動化廣告投放、聊天機器人、AIGC取代重複性工作，策略思考與創意整合能力更顯珍貴。學會與AI協作才能創造差異化價值。" },
+        { question: "跨領域整合行銷", answer: "未來行銷必須與產品設計、數據科學、UX及商業策略緊密連結。具備跨領域理解力的人才可精準回饋市場需求，提升產品成功率。" },
+        { question: "全球化與在地化行銷", answer: "全球視野與在地化並行是關鍵。品牌需適應不同文化消費行為，針對市場調整語言視覺溝通方式，直接影響品牌成功。" },
+        { question: "ESG永續行銷", answer: "消費者越來越重視ESG理念，品牌行銷需結合永續與社會責任，將商業目標與價值觀傳遞整合，打造長期可信賴形象。" },
+        { question: "行銷人員必備技能", answer: "未來行銷職能為數據分析、內容創造、AI協作、跨域溝通及策略性思維。持續學習與快速適應科技變化將脫穎而出。" },
+        { question: "生成式AI對行銷影響", answer: "AIGC可快速生成文案及素材，但需要行銷人優化品牌調性並注入情感。行銷團隊需重新設計工作流程，將AI當作協作夥伴。" },
+        { question: "行銷職涯建議", answer: "積極培養數據判讀力、學習數據視覺化與行銷科技工具，同時強化品牌敘事力與策略思維。跨部門協作經驗將大幅加分。" },
+        { question: "什麼是數據驅動行銷", answer: "數據驅動行銷是以消費者行為數據、預測模型為核心決策依據，從洞察到執行全鏈路數據化，以提升ROI並實現精準溝通。" }
+    ];
+
+    const additionalQA = [
+        { question: "你好", answer: "您好，我是AI行銷數據顧問，專門解析數位轉型趨勢與職涯發展。請問您想探討哪一項行銷未來能力？" },
+        { question: "嗨", answer: "歡迎。資料驅動的行銷時代已來臨，有興趣了解數據分析或AI行銷策略嗎？" },
+        { question: "早安", answer: "早晨好，今日數據洞察：87%企業正在升級行銷科技，隨時為您解析趨勢。" },
+        { question: "謝謝", answer: "樂意為您提供行銷未來洞察，隨時提問。" },
+        { question: "再見", answer: "期待下次交流，持續關注行銷數據轉型趨勢。" },
+        { question: "推薦學習工具", answer: "建議學習 Python, SQL, Tableau, Google Analytics 4 以及 AI 內容工具如 Copilot, Midjourney 等。" },
+        { question: "未來五年行銷趨勢", answer: "超個人化、對話式商務、AI代理、隱私合規數據策略及永續價值鏈將主導行銷創新。" }
+    ];
+
+    const allQAPairs = [...marketingKnowledge, ...additionalQA];
+
+    function simpleTokenize(text) {
+        const chineseSeq = text.match(/[\u4e00-\u9fa5]+/g) || [];
+        const englishSeq = text.match(/[a-zA-Z0-9]+/g) || [];
+        let tokens = [];
+        chineseSeq.forEach(chunk => {
+            for (let i = 0; i < chunk.length; i++) {
+                tokens.push(chunk[i]);
+                if (i < chunk.length-1) tokens.push(chunk[i]+chunk[i+1]);
+            }
+        });
+        englishSeq.forEach(word => tokens.push(word.toLowerCase()));
+        return [...new Set(tokens.filter(t => t.trim().length > 0))];
+    }
+
+    const processedQA = allQAPairs.map(item => ({
+        ...item,
+        tokens: simpleTokenize(item.question)
+    }));
+
+    function jaccardSimilarity(tokensA, tokensB) {
+        if (tokensA.length === 0 && tokensB.length === 0) return 1;
+        const setA = new Set(tokensA), setB = new Set(tokensB);
+        const inter = new Set([...setA].filter(x => setB.has(x)));
+        const union = new Set([...setA, ...setB]);
+        return inter.size / union.size;
+    }
+
+    function getBestResponse(userMessage) {
+        const userTokens = simpleTokenize(userMessage);
+        if (userTokens.length === 0) return { answer: "請輸入完整詞句，協助您解析行銷數據趨勢。", score: 0 };
+        let bestScore = 0, bestIdx = -1;
+        for (let i = 0; i < processedQA.length; i++) {
+            const sim = jaccardSimilarity(userTokens, processedQA[i].tokens);
+            if (sim > bestScore) { bestScore = sim; bestIdx = i; }
+        }
+        const threshold = 0.16;
+        if (bestIdx !== -1 && bestScore >= threshold) {
+            return { answer: processedQA[bestIdx].answer, score: bestScore };
+        }
+        return { answer: "DATA: 目前趨勢庫尚未精準對應，建議提問如「數據分析能力的重要性」、「內容行銷演變」、「AI自動化影響」或「跨領域整合」。", score: bestScore };
+    }
+
+    const messagesArea = document.getElementById('messagesArea');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+
+    function appendMessage(role, text, similarity = null) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${role}`;
+        const avatar = document.createElement('div');
+        avatar.className = 'avatar-icon';
+        avatar.innerHTML = role === 'user' ? '<i class="fas fa-user-graduate"></i>' : '<i class="fas fa-chart-simple"></i>';
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.innerHTML = `<span>${text.replace(/\n/g, '<br>')}</span>`;
+        if (similarity !== null && role === 'bot') {
+            const scoreSpan = document.createElement('div');
+            scoreSpan.className = 'match-score';
+            scoreSpan.innerHTML = `DATA: 意圖匹配度 ${(similarity * 100).toFixed(1)}% · 知識庫索引`;
+            bubble.appendChild(scoreSpan);
+        }
+        msgDiv.appendChild(avatar);
+        msgDiv.appendChild(bubble);
+        messagesArea.appendChild(msgDiv);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+
+    let typingDiv = null;
+    function showTyping() {
+        if (typingDiv) typingDiv.remove();
+        typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot';
+        typingDiv.innerHTML = `<div class="avatar-icon"><i class="fas fa-brain"></i></div><div class="typing-indicator">AI 行銷引擎運算中 <span></span><span></span><span></span></div>`;
+        messagesArea.appendChild(typingDiv);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+    function hideTyping() {
+        if (typingDiv) { typingDiv.remove(); typingDiv = null; }
+    }
+
+    async function sendMessage() {
+        const msg = userInput.value.trim();
+        if (!msg) return;
+        appendMessage('user', msg);
+        userInput.value = '';
+        showTyping();
+        await new Promise(r => setTimeout(r, 480 + Math.random() * 280));
+        const { answer, score } = getBestResponse(msg);
+        hideTyping();
+        appendMessage('bot', answer, score);
+        if (window.triggerCorePulse) window.triggerCorePulse();
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => e.key === 'Enter' && sendMessage());
+
+    // 數據核心動態視覺
+    const canvas = document.getElementById('dataCoreCanvas');
+    const ctx = canvas.getContext('2d');
+    let mouseX = 0, mouseY = 0;
+    let blinkState = false;
+    let timeFlow = 0;
+    let animId = null;
+
+    function setCanvasSize() {
+        if (canvas.width !== 300 || canvas.height !== 300) {
+            canvas.width = 300;
+            canvas.height = 300;
+        }
+    }
+
+    function drawDataCore(blink = false) {
+        if (!ctx) return;
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+        const gradBack = ctx.createRadialGradient(w/2, h/2, 20, w/2, h/2, w*0.48);
+        gradBack.addColorStop(0, '#0b2e47');
+        gradBack.addColorStop(1, '#02182b');
+        ctx.beginPath();
+        ctx.arc(w/2, h/2, w*0.47, 0, Math.PI*2);
+        ctx.fillStyle = gradBack;
+        ctx.fill();
+        for (let i = 0; i < 3; i++) {
+            ctx.beginPath();
+            ctx.arc(w/2, h/2, w*(0.38 + i*0.06), 0, Math.PI*2);
+            ctx.strokeStyle = `rgba(56, 189, 248, ${0.5 - i*0.15})`;
+            ctx.lineWidth = 2.2;
+            ctx.setLineDash([8, 12]);
+            ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        for (let x = 0; x < 8; x++) {
+            const xPos = w*0.2 + x*25;
+            ctx.beginPath();
+            ctx.moveTo(xPos, h*0.3);
+            ctx.lineTo(xPos, h*0.7);
+            ctx.strokeStyle = '#1e79a7';
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+        }
+        for (let y = 0; y < 6; y++) {
+            const yPos = h*0.3 + y*20;
+            ctx.beginPath();
+            ctx.moveTo(w*0.2, yPos);
+            ctx.lineTo(w*0.8, yPos);
+            ctx.stroke();
+        }
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#00c8ff';
+        ctx.fillStyle = '#175c85';
+        ctx.beginPath();
+        ctx.rect(w*0.44, h*0.44, w*0.12, h*0.12);
+        ctx.fill();
+        ctx.fillStyle = '#7ad0ff';
+        ctx.beginPath();
+        ctx.rect(w*0.47, h*0.47, w*0.06, h*0.06);
+        ctx.fill();
+        for (let i = -1; i <= 1; i++) {
+            for(let j=-1; j<=1; j++) {
+                ctx.fillStyle = '#aaf0ff';
+                ctx.beginPath();
+                ctx.arc(w*0.5 + i*8, h*0.5 + j*8, 2, 0, Math.PI*2);
+                ctx.fill();
+            }
+        }
+        ctx.beginPath();
+        const timeVar = timeFlow * 0.02;
+        for(let sx = -30; sx <= 30; sx+=4) {
+            let x = w/2 + sx;
+            let yOff = Math.sin(sx * 0.2 + timeVar) * 7;
+            if(sx === -30) ctx.moveTo(x, h*0.72 + yOff);
+            else ctx.lineTo(x, h*0.72 + yOff);
+        }
+        ctx.strokeStyle = '#3bc0fc';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        
+        const eyeR = w*0.085;
+        const leftEyeX = w*0.36, leftEyeY = h*0.43;
+        const rightEyeX = w*0.64, rightEyeY = h*0.43;
+        ctx.fillStyle = '#ddf4ff';
+        ctx.shadowBlur = 4;
+        ctx.beginPath(); ctx.arc(leftEyeX, leftEyeY, eyeR, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(rightEyeX, rightEyeY, eyeR, 0, Math.PI*2); ctx.fill();
+        let maxOffset = eyeR * 0.5;
+        let leftPupilX = leftEyeX + mouseX * maxOffset;
+        let leftPupilY = leftEyeY + mouseY * maxOffset * 0.7;
+        let rightPupilX = rightEyeX + mouseX * maxOffset;
+        let rightPupilY = rightEyeY + mouseY * maxOffset * 0.7;
+        leftPupilX = Math.min(Math.max(leftPupilX, leftEyeX - eyeR*0.45), leftEyeX + eyeR*0.45);
+        leftPupilY = Math.min(Math.max(leftPupilY, leftEyeY - eyeR*0.45), leftEyeY + eyeR*0.45);
+        rightPupilX = Math.min(Math.max(rightPupilX, rightEyeX - eyeR*0.45), rightEyeX + eyeR*0.45);
+        rightPupilY = Math.min(Math.max(rightPupilY, rightEyeY - eyeR*0.45), rightEyeY + eyeR*0.45);
+        ctx.fillStyle = '#010f1c';
+        ctx.beginPath(); ctx.arc(leftPupilX, leftPupilY, eyeR*0.48, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(rightPupilX, rightPupilY, eyeR*0.48, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = 'white';
+        ctx.beginPath(); ctx.arc(leftPupilX-2.5, leftPupilY-2.5, 2.5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(rightPupilX-2.5, rightPupilY-2.5, 2.5, 0, Math.PI*2); ctx.fill();
+        if(blink) {
+            ctx.fillStyle = '#0a3850';
+            ctx.beginPath(); ctx.ellipse(leftEyeX, leftEyeY, eyeR, eyeR*0.2, 0, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(rightEyeX, rightEyeY, eyeR, eyeR*0.2, 0, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.shadowBlur = 0;
+    }
+
+    function startCoreAnimation() {
+        function animate() {
+            timeFlow = (timeFlow + 1) % 360;
+            drawDataCore(blinkState);
+            animId = requestAnimationFrame(animate);
+        }
+        animate();
+        setInterval(() => {
+            blinkState = true;
+            drawDataCore(true);
+            setTimeout(() => { blinkState = false; drawDataCore(false); }, 130);
+        }, 4000);
+    }
+    window.triggerCorePulse = () => {
+        blinkState = true;
+        drawDataCore(true);
+        setTimeout(() => { blinkState = false; drawDataCore(false); }, 150);
+    };
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const cx = rect.left + rect.width/2;
+        const cy = rect.top + rect.height/2;
+        let relX = (e.clientX - cx) / (rect.width/2);
+        let relY = (e.clientY - cy) / (rect.height/2);
+        relX = Math.min(Math.max(relX, -0.55), 0.55);
+        relY = Math.min(Math.max(relY, -0.5), 0.5);
+        mouseX = relX; mouseY = relY;
+        drawDataCore(blinkState);
+    });
+    canvas.addEventListener('mouseleave', () => { mouseX = 0; mouseY = 0; drawDataCore(blinkState); });
+    setCanvasSize();
+    startCoreAnimation();
+    window.addEventListener('resize', () => drawDataCore(false));
+</script>
+</body>
+</html>
